@@ -3,5 +3,5 @@ help: ## Show help
 	@echo "Targets:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-run: ## Run the server
+run: ## Run the application
 	pipenv run python run.py

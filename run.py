@@ -4,7 +4,7 @@ import re
 
 
 from deputy.auth import get_deputy_session
-from deputy.employee import get_employee_id
+from deputy.employee import get_employee_id, get_previous_approvers
 from deputy.pager import submit_daily_pager
 
 
@@ -26,6 +26,7 @@ def parse_args():
 
     sub_parser = parser.add_subparsers(dest="cmd")
 
+    # Daily Pager Sub Command
     daily_pager = sub_parser.add_parser("pager", help="Add Daily Pager")
     daily_pager.add_argument(
         "--start-date",
@@ -44,8 +45,7 @@ def parse_args():
     daily_pager.add_argument(
         "--notify",
         "-n",
-        required=True,
-        help="Employee ID to notify",
+        help="Employee ID to notify, if not provided the set of all previous approvers will be notified",  # noqa
         type=int,
     )
 
@@ -61,12 +61,15 @@ def main():
 
     if parser.cmd == "pager":
         employee_id = get_employee_id(access_token)
+        approvers = parser.notify
+        if not approvers:
+            approvers = get_previous_approvers(access_token)
         submit_daily_pager(
             access_token,
             employee_id=employee_id,
             start_date=parser.start_date,
             duration=parser.duration,
-            notify="764",
+            notify=approvers,
             dry_run=parser.dry_run,
         )
 
