@@ -4,7 +4,10 @@ import re
 
 
 from deputy.auth import get_deputy_session
-from deputy.employee import get_employee_id, get_previous_approvers
+from deputy.employee import (
+    get_current_employee_id,
+    get_previous_approvers,
+)
 from deputy.pager import submit_daily_pager
 
 
@@ -60,10 +63,11 @@ def main():
     print("Access Token Successfully Obtained")
 
     if parser.cmd == "pager":
-        employee_id = get_employee_id(access_token)
+        employee_id = get_current_employee_id(access_token)
         approvers = parser.notify
         if not approvers:
             approvers = get_previous_approvers(access_token)
+
         submit_daily_pager(
             access_token,
             employee_id=employee_id,

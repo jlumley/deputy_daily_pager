@@ -3,7 +3,7 @@ import requests
 from deputy.auth import DeputySession
 
 
-def get_employee_id(session: DeputySession):
+def get_current_employee_id(session: DeputySession):
     api_url = f"https://{session.endpoint}/api/v1/me"
     headers = {
         "Authorization": f"Bearer {session.access_token}",
