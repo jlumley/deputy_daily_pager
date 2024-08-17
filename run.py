@@ -24,7 +24,7 @@ def parse_args():
         action="store_true",
     )
 
-    sub_parser = parser.add_subparsers(dest="cmd")
+    sub_parser = parser.add_subparsers(dest="cmd", required=True)
 
     # Daily Pager Sub Command
     daily_pager = sub_parser.add_parser("pager", help="Add Daily Pager")
