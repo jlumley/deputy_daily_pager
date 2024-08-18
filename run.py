@@ -30,7 +30,9 @@ def parse_args():
     sub_parser = parser.add_subparsers(dest="cmd", required=True)
 
     # Daily Pager Sub Command
-    daily_pager = sub_parser.add_parser("pager", help="Add Daily Pager")
+    daily_pager = sub_parser.add_parser(
+        "pager", help="Add Daily Pager Leave Request"
+    )  # noqa
     daily_pager.add_argument(
         "--start-date",
         "-s",
