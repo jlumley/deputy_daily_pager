@@ -20,7 +20,7 @@ def validate_date(date_str: str):
 
 
 def get_default_start_date():
-    today = datetime.date()
+    today = datetime.date.today()
     return today.strftime("%Y-%m-%d")
 
 
