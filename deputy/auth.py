@@ -2,7 +2,6 @@ import http.server
 import socketserver
 import os
 import requests
-import threading
 import webbrowser
 
 from dataclasses import dataclass
