@@ -61,17 +61,17 @@ def main():
     parser = parse_args()
     if parser.dry_run:
         print("********** Dry Run Mode **********")
-    access_token = get_deputy_session()
+    deputy_session = get_deputy_session()
     print("Access Token Successfully Obtained")
 
     if parser.cmd == "pager":
-        employee_id = get_current_employee_id(access_token)
+        employee_id = get_current_employee_id(deputy_session)
         approvers = parser.notify
         if not approvers:
-            approvers = get_previous_approvers(access_token)
+            approvers = get_previous_approvers(deputy_session)
 
         submit_daily_pager(
-            access_token,
+            deputy_session,
             employee_id=employee_id,
             start_date=parser.start_date,
             duration=parser.duration,
