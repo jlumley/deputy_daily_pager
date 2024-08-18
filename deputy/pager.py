@@ -47,6 +47,7 @@ def submit_daily_pager(
     start_date: str,
     duration: int,
     notify: str,
+    comment: str,
     dry_run: bool,
 ):
     """
@@ -63,6 +64,6 @@ def submit_daily_pager(
                 employee_id=employee_id,
                 date_str=date_str,
                 notify=notify,
-                comment="Daily Pager",
+                comment=comment,
             )
         date_obj += timedelta(days=1)
