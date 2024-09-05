@@ -41,7 +41,8 @@ def add_employee_leave(
     )
 
     response.raise_for_status()
-    print(f"Leave added successfully for {date_str}")
+    leave_request = response.json().get("Id")
+    print(f"Leave request {leave_request} added successfully for {date_str}")
 
 
 def submit_daily_pager(
