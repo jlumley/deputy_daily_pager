@@ -13,6 +13,9 @@ def add_employee_leave(
     notify: str,
     comment: str,
 ):
+    if not notify:
+        raise ValueError("Notify list is required")
+
     api_url = f"https://{session.endpoint}/api/v1/my/leave"
     headers = {
         "Authorization": f"Bearer {session.access_token}",
