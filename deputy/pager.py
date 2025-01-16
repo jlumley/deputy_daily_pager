@@ -40,8 +40,13 @@ def add_employee_leave(
         api_url, headers=headers, data=json.dumps(payload), allow_redirects=True  # noqa
     )
 
-    response.raise_for_status()
-    leave_request = response.json().get("Id")
+    try:
+        response.raise_for_status()
+        leave_request = response.json().get("Id")
+    except Exception as e:
+        print(f"Error: {response.text}")
+        raise e
+
     print(f"Leave request {leave_request} added successfully for {date_str}")
 
 
