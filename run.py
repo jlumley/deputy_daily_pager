@@ -1,7 +1,8 @@
 #! usr/bin/env python3
 import argparse
-import re
 import datetime
+import os
+import re
 
 
 from deputy.auth import get_deputy_session
@@ -10,6 +11,8 @@ from deputy.employee import (
     get_previous_approvers,
 )
 from deputy.pager import submit_daily_pager
+
+DEFAULT_NOTIFY = os.environ.get("DEPUTY_DEFAULT_NOTIFY")
 
 
 def validate_date(date_str: str):
@@ -66,6 +69,7 @@ def parse_args():
         "--notify",
         "-n",
         help="Employee ID to notify, if not provided the set of all previous approvers will be notified",  # noqa
+        default=DEFAULT_NOTIFY,
         type=int,
     )
 
