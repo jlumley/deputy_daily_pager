@@ -27,6 +27,11 @@ class DeputySession:
 
 
 def get_authorization_url():
+    if not CLIENT_ID or not CLIENT_SECRET:
+        raise ValueError(
+            "Missing DEPUTY_CLIENT_ID or DEPUTY_CLIENT_SECRET environment "
+            "variables."
+        )
     params = {
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
@@ -90,4 +95,6 @@ def get_deputy_session():
         httpd.server_close()
 
     global oauth_code
+    if not oauth_code:
+        raise ValueError("No OAuth code received. Please try again.")
     return get_access_token(oauth_code)

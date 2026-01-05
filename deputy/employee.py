@@ -9,6 +9,7 @@ def get_current_employee_id(session: DeputySession):
         "Authorization": f"Bearer {session.access_token}",
     }
     resp = requests.get(api_url, headers=headers)
+    resp.raise_for_status()
     json_resp = resp.json()
     print(f"Current User: {json_resp['Name']}")
     print(f"Employee ID: {json_resp['EmployeeId']}")
@@ -25,7 +26,8 @@ def get_previous_approvers(session: DeputySession):
         "Accept": "application/json",
     }
     response = requests.get(api_url, headers=headers, allow_redirects=True)
-    for leave in response.json():
+    response.raise_for_status()
+    for leave in response.json() or []:
         for manager in leave["NotifyManagerArray"]:
             previous_approvers.add(manager)
 

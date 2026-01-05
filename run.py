@@ -1,4 +1,4 @@
-#! usr/bin/env python3
+#!/usr/bin/env python3
 import argparse
 import datetime
 import os
@@ -13,12 +13,13 @@ from deputy.employee import (
 from deputy.pager import submit_daily_pager
 
 DEFAULT_NOTIFY = os.environ.get("DEPUTY_DEFAULT_NOTIFY")
+DEFAULT_DURATION = os.environ.get("DEPUTY_DEFAULT_DURATION")
 
 
 def validate_date(date_str: str):
     pattern = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     if not pattern.match(date_str):
-        raise ValueError("Invalid date format. Expected {YYYY-MM-DD}")
+        raise ValueError("Invalid date format. Expected YYYY-MM-DD.")
     return date_str
 
 
@@ -27,7 +28,48 @@ def get_default_start_date():
     return today.strftime("%Y-%m-%d")
 
 
-def parse_args():
+def get_default_duration():
+    if DEFAULT_DURATION is None:
+        return 7
+    try:
+        duration = int(DEFAULT_DURATION)
+    except ValueError as exc:
+        raise ValueError("DEPUTY_DEFAULT_DURATION must be an integer.") from exc
+    if duration <= 0:
+        raise ValueError("DEPUTY_DEFAULT_DURATION must be greater than zero.")
+    return duration
+
+
+def validate_positive_int(value: str):
+    try:
+        number = int(value)
+    except ValueError as exc:
+        raise ValueError("Duration must be an integer.") from exc
+    if number <= 0:
+        raise ValueError("Duration must be greater than zero.")
+    return number
+
+
+def parse_notify_list(value):
+    if value is None:
+        return None
+    if isinstance(value, list):
+        return value
+    ids = []
+    for chunk in str(value).split(","):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        try:
+            ids.append(int(chunk))
+        except ValueError as exc:
+            raise ValueError(
+                "Notify must be a comma-separated list of employee IDs."
+            ) from exc
+    return ids
+
+
+def parse_args(args=None):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -54,9 +96,9 @@ def parse_args():
     daily_pager.add_argument(
         "--duration",
         "-d",
-        required=True,
         help="Number of days carrying the pager",
-        type=int,
+        default=get_default_duration(),
+        type=validate_positive_int,
     )
     daily_pager.add_argument(
         "--comment",
@@ -68,12 +110,15 @@ def parse_args():
     daily_pager.add_argument(
         "--notify",
         "-n",
-        help="Employee ID to notify, if not provided the set of all previous approvers will be notified",  # noqa
+        help=(
+            "Comma-separated employee IDs to notify. "
+            "If not provided, previous approvers will be notified."
+        ),
         default=DEFAULT_NOTIFY,
-        type=int,
+        type=str,
     )
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def main():
@@ -85,15 +130,21 @@ def main():
 
     if parser.cmd == "pager":
         employee_id = get_current_employee_id(deputy_session)
-        if not parser.notify:
-            parser.notify = get_previous_approvers(deputy_session)
+        notify_list = parse_notify_list(parser.notify)
+        if not notify_list:
+            notify_list = get_previous_approvers(deputy_session)
+        if not notify_list:
+            raise ValueError(
+                "No notify targets found. Use --notify or set "
+                "DEPUTY_DEFAULT_NOTIFY."
+            )
 
         submit_daily_pager(
             deputy_session,
             employee_id=employee_id,
             start_date=parser.start_date,
             duration=parser.duration,
-            notify=parser.notify,
+            notify=notify_list,
             comment=parser.comment,
             dry_run=parser.dry_run,
         )

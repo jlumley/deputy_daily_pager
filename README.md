@@ -13,6 +13,8 @@ Give it a name, and set the redirect uri to `http://localhost:8087`
 ```bash
 export DEPUTY_CLIENT_ID="<client_id>"
 export DEPUTY_CLIENT_SECRET="<client_secret>"
+export DEPUTY_DEFAULT_NOTIFY="1234,5678"
+export DEPUTY_DEFAULT_DURATION="7"
 
 pipenv install
 ```
@@ -26,7 +28,7 @@ pipenv install
 ```bash
 pipenv run python run.py pager --help
 
-usage: run.py pager [-h] [--start-date START_DATE] --duration DURATION [--comment COMMENT] [--notify NOTIFY]
+usage: run.py pager [-h] [--start-date START_DATE] [--duration DURATION] [--comment COMMENT] [--notify NOTIFY]
 
 options:
   -h, --help            show this help message and exit
@@ -37,6 +39,13 @@ options:
   --comment COMMENT, -c COMMENT
                         Comment to be added to each daily pager leave request
   --notify NOTIFY, -n NOTIFY
-                        Employee ID to notify, if not provided the set of all previous approvers will be notified
+                        Comma-separated employee IDs to notify. If not provided, previous approvers will be notified.
 ```
 
+Examples:
+
+```bash
+pipenv run python run.py pager --duration 5
+pipenv run python run.py pager --start-date 2024-03-01 --duration 7
+pipenv run python run.py pager --notify 1234,5678
+```

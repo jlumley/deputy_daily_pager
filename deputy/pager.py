@@ -1,4 +1,3 @@
-import json
 import requests
 
 from datetime import datetime, timedelta
@@ -10,26 +9,22 @@ def add_employee_leave(
     session: DeputySession,
     employee_id: int,
     date_str: str,
-    notify: str,
+    notify: list[int],
     comment: str,
 ):
     if not notify:
         raise ValueError("Notify list is required")
 
     api_url = f"https://{session.endpoint}/api/v1/my/leave"
-    headers = {
-        "Authorization": f"Bearer {session.access_token}",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-Requested-With": "XMLHttpRequest",
-    }
+    headers = {"Authorization": f"Bearer {session.access_token}"}
     payload = {
         "Id": 0,
-        "Employee": 1337,
+        "Employee": employee_id,
         "DateStart": date_str,
         "DateEnd": date_str,
         "LeaveRule": "31",
         "Comment": comment,
-        "Notify": [notify],
+        "Notify": notify,
         "StartHour": 0,
         "StartMinute": 0,
         "EndHour": 1,
@@ -37,7 +32,7 @@ def add_employee_leave(
         "Status": 0,
     }
     response = requests.post(
-        api_url, headers=headers, data=json.dumps(payload), allow_redirects=True  # noqa
+        api_url, headers=headers, json=payload, allow_redirects=True  # noqa
     )
 
     try:
@@ -55,7 +50,7 @@ def submit_daily_pager(
     employee_id: int,
     start_date: str,
     duration: int,
-    notify: str,
+    notify: list[int],
     comment: str,
     dry_run: bool,
 ):
@@ -66,7 +61,13 @@ def submit_daily_pager(
     date_obj = datetime.strptime(start_date, "%Y-%m-%d")
     for i in range(duration):
         date_str = date_obj.strftime("%Y-%m-%d")
-        print(f"Adding Leave for {date_str}")
+        if dry_run:
+            print(
+                "Dry run: would add leave for "
+                f"{date_str} with notify={notify}"
+            )
+        else:
+            print(f"Adding Leave for {date_str}")
         if not dry_run:
             add_employee_leave(
                 session=session,
